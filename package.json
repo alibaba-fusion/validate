@@ -1,0 +1,36 @@
+{
+  "name": "@alifd/validate",
+  "version": "1.0.0",
+  "description": "Validation to be used with @alifd/field",
+  "files": [
+    "demo/",
+    "lib/",
+    "build/"
+  ],
+  "main": "lib/index.js",
+  "scripts": {
+    "start": "ice-scripts dev",
+    "build": "ice-scripts build",
+    "prepublishOnly": "npm run build"
+  },
+  "license": "MIT",
+  "keywords": [
+    "ice",
+    "react",
+    "component"
+  ],
+  "devDependencies": {
+    "ice-plugin-component": "^0.1.1",
+    "ice-plugin-fusion": "^0.1.4",
+    "ice-scripts": "^2.0.0",
+    "react": "^16.3.0",
+    "react-dom": "^16.3.0"
+  },
+  "componentConfig": {
+    "name": "validate",
+    "title": "Validate",
+    "categories": [
+      "表单"
+    ]
+  }
+}
