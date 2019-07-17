@@ -38,5 +38,13 @@
       "表单"
     ]
   },
-  "homepage": "https://unpkg.com/@alifd/validate@1.0.0/build/index.html"
+  "homepage": "https://github.com/alibaba-fusion/validate",
+  "bugs": "https://github.com/alibaba-fusion/validate/issues",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alibaba-fusion/validate.git"
+  }
 }
