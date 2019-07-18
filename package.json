@@ -13,7 +13,8 @@
     "build": "ice-scripts build",
     "prepublishOnly": "npm run build",
     "test": "ice-scripts test",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "eslint": "eslint '@(src|test)/**/*.@(js|jsx)'"
   },
   "lint-staged": {
     "@(src|scripts|docs/*/demo)/**/*.@(js|jsx)": [
