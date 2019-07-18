@@ -1,6 +1,7 @@
 import assert from 'power-assert';
 import Schema from '../src';
 
+/* global describe, it */
 describe('unknow usage', () => {
     it('works with unknow rule', done => {
         new Schema({

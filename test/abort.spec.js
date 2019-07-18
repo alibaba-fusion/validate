@@ -1,9 +1,10 @@
 import assert from 'power-assert';
 import Schema from '../src';
 
+/* global describe, it */
 describe('abort', () => {
     it('works with abort', done => {
-        let schema = new Schema({
+        const schema = new Schema({
             v: [
                 {
                     validator(rule, value, callback) {
@@ -19,7 +20,7 @@ describe('abort', () => {
             {
                 v: 2,
             },
-            errors => {
+            () => {
                 assert('should not be here' === '');
                 done();
             }

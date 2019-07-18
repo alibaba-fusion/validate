@@ -1,6 +1,7 @@
 import assert from 'power-assert';
 import Schema from '../src';
 
+/* global describe, it */
 describe('pattern', () => {
     it('works for non-required empty string', done => {
         new Schema({

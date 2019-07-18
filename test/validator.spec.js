@@ -1,6 +1,7 @@
 import assert from 'power-assert';
 import Schema from '../src';
 
+/* global describe, it */
 describe('validator', () => {
     it('works', done => {
         new Schema({
@@ -79,19 +80,19 @@ describe('promise validator', () => {
         new Schema({
             v: [
                 {
-                    validator(rule, value) {
+                    validator() {
                         return Promise.reject(new Error('e1'));
                     },
                 },
                 {
-                    validator(rule, value) {
+                    validator() {
                         return Promise.reject(new Error('e2'));
                     },
                 },
             ],
             v2: [
                 {
-                    validator(rule, value) {
+                    validator() {
                         return Promise.reject(new Error('e3'));
                     },
                 },
@@ -114,19 +115,19 @@ describe('promise validator', () => {
             {
                 v: [
                     {
-                        validator(rule, value) {
+                        validator() {
                             return Promise.reject(new Error('e1'));
                         },
                     },
                     {
-                        validator(rule, value) {
+                        validator() {
                             return Promise.reject(new Error('e2'));
                         },
                     },
                 ],
                 v2: [
                     {
-                        validator(rule, value) {
+                        validator() {
                             return Promise.reject(new Error('e3'));
                         },
                     },

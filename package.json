@@ -12,7 +12,22 @@
     "start": "ice-scripts dev",
     "build": "ice-scripts build",
     "prepublishOnly": "npm run build",
-    "test": "ice-scripts test"
+    "test": "ice-scripts test",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "@(src|scripts|docs/*/demo)/**/*.@(js|jsx)": [
+      "prettier --write"
+    ],
+    "@(src|scripts|docs/*/demo)/**/*.@(js|jsx|md)": [
+      "eslint",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
   },
   "license": "MIT",
   "keywords": [
@@ -21,10 +36,19 @@
     "component"
   ],
   "devDependencies": {
+    "@alifd/eslint-config-next": "^2.0.0",
+    "@commitlint/cli": "^8.1.0",
+    "babel-eslint": "^10.0.2",
     "eslint": "^6.0.1",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-import": "^2.18.0",
+    "eslint-plugin-markdown": "^1.0.0",
+    "eslint-plugin-react": "^7.14.2",
+    "husky": "^3.0.0",
     "ice-plugin-component": "^0.1.1",
     "ice-plugin-fusion": "^0.1.4",
     "ice-scripts": "^2.0.0",
+    "lint-staged": "^9.2.0",
     "mocha": "^6.1.4",
     "power-assert": "^1.6.1",
     "prettier": "^1.18.2",

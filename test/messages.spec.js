@@ -1,6 +1,7 @@
 import assert from 'power-assert';
 import Schema from '../src';
 
+/* global describe, it */
 describe('messages', () => {
     it('can call messages', done => {
         const messages = {

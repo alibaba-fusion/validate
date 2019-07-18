@@ -3,6 +3,7 @@ import Schema from '../src';
 
 const required = true;
 
+/* global describe, it */
 describe('required', () => {
     it('error with null or undefined', done => {
         new Schema({

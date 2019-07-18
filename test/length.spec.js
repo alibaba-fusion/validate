@@ -1,6 +1,7 @@
 import assert from 'power-assert';
 import Schema from '../src';
 
+/* global describe, it */
 describe('length', () => {
     it('error with minLength', done => {
         new Schema({

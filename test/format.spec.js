@@ -1,6 +1,7 @@
 import assert from 'power-assert';
 import Schema from '../src';
 
+/* global describe, it */
 describe('format', () => {
     describe('url', () => {
         it('works for empty string', done => {
