@@ -1,3 +1,5 @@
+import { getValidationMethod } from './validator';
+
 const formatRegExp = /%[sdj%]/g;
 
 export function format(...args) {
@@ -103,6 +105,37 @@ export function asyncMap(objArr, option, func, callback) {
     });
 }
 
+async function resolveErrorPromiseInSeries(arr, func) {
+    return arr.reduce(async (prevPromise, next) => {
+        let errors;
+        try {
+            errors = await prevPromise;
+        } catch (e) {
+            errors = e;
+        }
+
+        if (errors && errors.length) {
+            return errors;
+        }
+
+        return func(next);
+    }, Promise.resolve());
+}
+
+export async function asyncMapPromise(objArr, option, func) {
+    if (option.first) {
+        const flatObjArr = flattenObjArr(objArr);
+
+        return resolveErrorPromiseInSeries(flatObjArr, func);
+    }
+
+    const objArrValues = Object.values(objArr);
+
+    return Promise.all(
+        objArrValues.map(val => resolveErrorPromiseInSeries(val, func))
+    );
+}
+
 export function complementError(rule) {
     return oe => {
         if (oe && oe.message) {
@@ -113,5 +146,73 @@ export function complementError(rule) {
             message: oe,
             field: rule.field,
         };
+    };
+}
+
+export function serializeRules(source, rules) {
+    // serialize rules
+    let arr;
+    let value;
+    const series = {};
+    const names = Object.keys(rules);
+    names.forEach(name => {
+        arr = rules[name];
+        value = source[name];
+
+        if (!Array.isArray(arr)) {
+            arr = [arr];
+        }
+
+        arr.forEach(rule => {
+            rule.validator = getValidationMethod(rule);
+            rule.field = name;
+            if (!rule.validator) {
+                return;
+            }
+            series[name] = series[name] || [];
+            series[name].push({ rule, value, source, field: name });
+        });
+    });
+
+    return series;
+}
+
+/**
+ *
+ * @param {Array} results errors from running validation
+ * @returns {Object} { errors: Array, fields: Object }
+ */
+export function processErrorResults(results) {
+    let errors = [];
+    let fields = {};
+
+    function add(e) {
+        if (Array.isArray(e)) {
+            errors = errors.concat(e);
+        } else {
+            errors.push(e);
+        }
+    }
+
+    for (let i = 0; i < results.length; i++) {
+        add(results[i]);
+    }
+
+    if (!errors.length) {
+        errors = null;
+        fields = null;
+    } else {
+        for (let i = 0; i < errors.length; i++) {
+            const field = errors[i].field;
+            if (field) {
+                fields[field] = fields[field] || [];
+                fields[field].push(errors[i]);
+            }
+        }
+    }
+
+    return {
+        errors,
+        fields,
     };
 }

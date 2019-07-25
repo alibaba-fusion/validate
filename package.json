@@ -13,6 +13,7 @@
     "build": "ice-scripts build",
     "prepublishOnly": "npm run build",
     "test": "ice-scripts test",
+    "test-watch": "ice-scripts test --jest-watchAll",
     "precommit": "lint-staged",
     "eslint": "eslint '@(src|test)/**/*.@(js|jsx)'"
   },
@@ -55,7 +56,8 @@
     "prettier": "^1.18.2",
     "react": "^16.3.0",
     "react-dom": "^16.3.0",
-    "semantic-release": "^15.13.18"
+    "semantic-release": "^15.13.18",
+    "sinon": "^7.3.2"
   },
   "componentConfig": {
     "name": "validate",
