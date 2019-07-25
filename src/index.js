@@ -1,6 +1,11 @@
 /* eslint-disable callback-return */
-import { complementError, asyncMap } from './util';
-import { getValidationMethod } from './validator';
+import {
+    complementError,
+    asyncMap,
+    asyncMapPromise,
+    serializeRules,
+    processErrorResults,
+} from './util';
 import defaultMessages from './messages';
 
 function noop() {}
@@ -32,7 +37,21 @@ class Schema {
         );
     }
 
+    /**
+     *
+     * @param {Object} source - map of field names and values to use in validation
+     * @param {Function} callback - OPTIONAL - callback to run after all
+     * @returns {null | Promise}
+     *          - { null } - if using callbacks
+     *          - { Promise }
+     *              - { null } - if no rules or no errors
+     *              - { errors: Array, fields: Object } - errors from validation and fields that have errors
+     */
     validate(source, callback) {
+        if (!callback) {
+            return this.validatePromise(source);
+        }
+
         if (!this._rules || Object.keys(this._rules).length === 0) {
             if (callback) {
                 callback(null);
@@ -40,29 +59,7 @@ class Schema {
             return;
         }
 
-        // serialize rules
-        let arr;
-        let value;
-        const series = {};
-        const names = Object.keys(this._rules);
-        names.forEach(name => {
-            arr = this._rules[name];
-            value = source[name];
-
-            if (!Array.isArray(arr)) {
-                arr = [arr];
-            }
-
-            arr.forEach(rule => {
-                rule.validator = getValidationMethod(rule);
-                rule.field = name;
-                if (!rule.validator) {
-                    return;
-                }
-                series[name] = series[name] || [];
-                series[name].push({ rule, value, source, field: name });
-            });
-        });
+        const series = serializeRules(source, this._rules);
 
         if (Object.keys(series).length === 0) {
             callback(null);
@@ -135,6 +132,67 @@ class Schema {
                 this.complete[idx - 1](results);
             }
         );
+    }
+
+    /**
+     *
+     * @param {Object} source - map of field names and values to use in validation
+     * @returns {Promise}
+     *          - {null} if no rules or no errors
+     *          - { errors: Array, fields: Object } - errors from validation and fields that have errors
+     */
+    async validatePromise(source) {
+        if (!this._rules || Object.keys(this._rules).length === 0) {
+            return Promise.resolve(null);
+        }
+
+        const series = serializeRules(source, this._rules);
+
+        if (Object.keys(series).length === 0) {
+            return Promise.resolve(null);
+        }
+
+        const results = await asyncMapPromise(
+            series,
+            this._options,
+            async data => {
+                const rule = data.rule;
+                rule.field = data.field;
+
+                let errors;
+
+                try {
+                    errors = await rule.validator(
+                        rule,
+                        data.value,
+                        this._options
+                    );
+                } catch (error) {
+                    errors = error;
+                }
+
+                if (errors) {
+                    if (!Array.isArray(errors)) {
+                        errors = [errors];
+                    }
+
+                    // 自定义错误
+                    if (errors.length && rule.message) {
+                        errors = [].concat(rule.message);
+                    }
+
+                    return errors.map(complementError(rule));
+                } else {
+                    return [];
+                }
+            }
+        );
+
+        if (!results) {
+            return { errors: results };
+        }
+
+        return processErrorResults(results);
     }
 }
 
