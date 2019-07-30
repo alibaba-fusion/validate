@@ -3,6 +3,9 @@ import rules from './rules/';
 
 /**
  * {required, format} => format; {required} => required
+ * If a promise is wanted from the validator, either return a promise from the callback,
+ *      or do not pass a callback
+ *
  * @param  {function} validator [description]
  * @param  {string} ruleType  [description]
  * @return {function}           [description]
@@ -17,16 +20,26 @@ export function validateFunc(validator, ruleType) {
             rules.required(rule, value, errors, options);
             if (errors.length > 0) {
                 if ('required' in rule) {
-                    cb(errors);
+                    if (cb) {
+                        return cb(errors);
+                    } else {
+                        return Promise.reject(errors);
+                    }
+                } else if (cb) {
+                    return cb([]); //忽略空数据的判断
                 } else {
-                    cb([]); //忽略空数据的判断
+                    return Promise.resolve(null);
                 }
-                return;
             }
         }
 
         validator(rule, value, errors, options);
-        cb(errors);
+        if (cb) {
+            return cb(errors);
+        }
+        if (Promise) {
+            return Promise.resolve(errors);
+        }
     };
 }
 

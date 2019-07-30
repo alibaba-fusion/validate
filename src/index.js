@@ -44,7 +44,7 @@ class Schema {
      * @returns {null | Promise}
      *          - { null } - if using callbacks
      *          - { Promise }
-     *              - { null } - if no rules or no errors
+     *              - { errors: null } - if no rules or no errors
      *              - { errors: Array, fields: Object } - errors from validation and fields that have errors
      */
     validate(source, callback) {
@@ -138,18 +138,18 @@ class Schema {
      *
      * @param {Object} source - map of field names and values to use in validation
      * @returns {Promise}
-     *          - {null} if no rules or no errors
+     *          - { errors: null } if no rules or no errors
      *          - { errors: Array, fields: Object } - errors from validation and fields that have errors
      */
     async validatePromise(source) {
         if (!this._rules || Object.keys(this._rules).length === 0) {
-            return Promise.resolve(null);
+            return Promise.resolve({ errors: null });
         }
 
         const series = serializeRules(source, this._rules);
 
         if (Object.keys(series).length === 0) {
-            return Promise.resolve(null);
+            return Promise.resolve({ errors: null });
         }
 
         const results = await asyncMapPromise(
@@ -165,6 +165,7 @@ class Schema {
                     errors = await rule.validator(
                         rule,
                         data.value,
+                        null,
                         this._options
                     );
                 } catch (error) {
@@ -187,10 +188,6 @@ class Schema {
                 }
             }
         );
-
-        if (!results) {
-            return { errors: results };
-        }
 
         return processErrorResults(results);
     }

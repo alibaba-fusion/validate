@@ -182,7 +182,7 @@ export function serializeRules(source, rules) {
  * @param {Array} results errors from running validation
  * @returns {Object} { errors: Array, fields: Object }
  */
-export function processErrorResults(results) {
+export function processErrorResults(results = []) {
     let errors = [];
     let fields = {};
 
