@@ -215,7 +215,7 @@ describe('promise validator', () => {
 describe('promise validator with promise callaback', () => {
     it('should resolve promise with null when no rules', async () => {
         const validator = new Schema({})
-        const errors = await validator.validate(
+        const { errors } = await validator.validate(
             {
                 v: 2,
             }
@@ -226,7 +226,7 @@ describe('promise validator with promise callaback', () => {
 
     it('should resolve promise with null when no rules and no callback', async () => {
         const validator = new Schema({})
-        const errors = await validator.validate(
+        const {errors} = await validator.validate(
             {
                 v: 2,
             },
@@ -242,7 +242,7 @@ describe('promise validator with promise callaback', () => {
                 },
             ],
         })
-        const errors = await validator.validate(
+        const {errors} = await validator.validate(
             {
                 v: 2,
             }
