@@ -105,10 +105,44 @@ describe('validator', () => {
             }
         );
     });
+
+    it('passes value on resolve', done => {
+        new Schema({
+            v: [
+                {
+                    validator(rule, value, callback) {
+                        callback(new Error('e1'));
+                    },
+                },
+                {
+                    validator(rule, value, callback) {
+                        callback(new Error('e2'));
+                    },
+                },
+            ],
+            v2: [
+                {
+                    validator(rule, value, callback) {
+                        callback(new Error('e3'));
+                    },
+                },
+            ],
+        }).validate(
+            {
+                v: 2,
+            },
+            errors => {
+                assert(errors.length === 2);
+                assert(errors[0].message === 'e1');
+                assert(errors[1].message === 'e3');
+                done();
+            }
+        );
+    });
 });
 
 describe('promise validator', () => {
-    it('works', done => {
+    it('works with reject', done => {
         new Schema({
             v: [
                 {
@@ -126,6 +160,40 @@ describe('promise validator', () => {
                 {
                     validator() {
                         return Promise.reject(new Error('e3'));
+                    },
+                },
+            ],
+        }).validate(
+            {
+                v: 2,
+            },
+            errors => {
+                assert(errors.length === 2);
+                assert(errors[0].message === 'e1');
+                assert(errors[1].message === 'e3');
+                done();
+            }
+        );
+    });
+
+    it('works with resolve', done => {
+        new Schema({
+            v: [
+                {
+                    validator() {
+                        return Promise.resolve(new Error('e1'));
+                    },
+                },
+                {
+                    validator() {
+                        return Promise.resolve(new Error('e2'));
+                    },
+                },
+            ],
+            v2: [
+                {
+                    validator() {
+                        return Promise.resolve(new Error('e3'));
                     },
                 },
             ],
@@ -256,7 +324,7 @@ describe('promise validator with promise callaback', () => {
             v: [
                 {
                     validator() {
-                        return Promise.resolve();;
+                        return Promise.resolve();
                     },
                 },
             ],
@@ -270,7 +338,7 @@ describe('promise validator with promise callaback', () => {
             v3: [
                 {
                     validator() {
-                        return Promise.resolve();;
+                        return Promise.resolve();
                     },
                 },
             ],
@@ -284,7 +352,7 @@ describe('promise validator with promise callaback', () => {
         assert.deepEqual(errors, null);
     });
 
-    it('should resolve with errors and fields when rules fail', async () => {
+    it('should resolve with errors and fields when rules fail with reject', async () => {
         const validator = new Schema({
             v: [
                 {
@@ -302,6 +370,42 @@ describe('promise validator with promise callaback', () => {
                 {
                     validator() {
                         return Promise.reject(new Error('e3'));
+                    },
+                },
+            ],
+        })
+
+        const { errors, fields } = await validator.validate(
+            {
+                v: 2,
+            }
+        );
+
+        
+        assert(errors.length === 2);
+        assert(Object.keys(fields).length === 2);
+        assert.equal(errors[0].message, 'e1');
+        assert.equal(errors[1].message, 'e3');
+    });
+
+    it('should resolve with errors and fields when rules resolve with value', async () => {
+        const validator = new Schema({
+            v: [
+                {
+                    validator() {
+                        return Promise.resolve('e1');
+                    },
+                },
+                {
+                    validator() {
+                        return Promise.resolve('e2');
+                    },
+                },
+            ],
+            v2: [
+                {
+                    validator() {
+                        return Promise.resolve('e3');
                     },
                 },
             ],
