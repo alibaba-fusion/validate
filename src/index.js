@@ -125,7 +125,7 @@ class Schema {
 
                 const res = rule.validator(rule, data.value, cb, this._options);
                 if (res && res.then) {
-                    res.then(e => cb(e), e => cb(e));
+                    res.then(() => cb(), e => cb(e));
                 }
             },
             results => {

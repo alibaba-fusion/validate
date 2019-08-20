@@ -181,19 +181,19 @@ describe('promise validator', () => {
             v: [
                 {
                     validator() {
-                        return Promise.resolve(new Error('e1'));
+                        return Promise.resolve();
                     },
                 },
                 {
                     validator() {
-                        return Promise.resolve(new Error('e2'));
+                        return Promise.resolve();
                     },
                 },
             ],
             v2: [
                 {
                     validator() {
-                        return Promise.resolve(new Error('e3'));
+                        return Promise.resolve();
                     },
                 },
             ],
@@ -202,9 +202,7 @@ describe('promise validator', () => {
                 v: 2,
             },
             errors => {
-                assert(errors.length === 2);
-                assert(errors[0].message === 'e1');
-                assert(errors[1].message === 'e3');
+                assert.equal(errors, null);
                 done();
             }
         );
@@ -388,24 +386,24 @@ describe('promise validator with promise callaback', () => {
         assert.equal(errors[1].message, 'e3');
     });
 
-    it('should resolve with errors and fields when rules resolve with value', async () => {
+    it('should resolve with errors and fields when rules reject with value', async () => {
         const validator = new Schema({
             v: [
                 {
                     validator() {
-                        return Promise.resolve('e1');
+                        return Promise.reject('e1');
                     },
                 },
                 {
                     validator() {
-                        return Promise.resolve('e2');
+                        return Promise.reject('e2');
                     },
                 },
             ],
             v2: [
                 {
                     validator() {
-                        return Promise.resolve('e3');
+                        return Promise.reject('e3');
                     },
                 },
             ],
