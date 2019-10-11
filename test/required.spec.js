@@ -10,10 +10,12 @@ describe('required', () => {
             new Schema({
                 v1: { required },
                 v2: { required },
+                v3: { required: false },
             }).validate(
                 {
                     v1: null,
                     v2: undefined,
+                    v3: ''
                 },
                 errors => {
                     assert(errors.length === 2);

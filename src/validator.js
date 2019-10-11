@@ -18,15 +18,16 @@ export function validateFunc(validator, ruleType) {
         if (ruleType !== 'required') {
             const errors = [];
             rules.required(rule, value, errors, options);
+            // 空数据
             if (errors.length > 0) {
-                if ('required' in rule) {
+                if ('required' in rule && rule.required) {
                     if (cb) {
                         return cb(errors);
                     } else {
                         return Promise.reject(errors);
                     }
                 } else if (cb) {
-                    return cb([]); //忽略空数据的判断
+                    return cb([]); //空数据，并且没有require要求，则忽略
                 } else {
                     return Promise.resolve(null);
                 }
@@ -69,7 +70,7 @@ export function getValidationMethod(rule) {
     }
 
     // 有其他位置参数
-    if ('required' in rule) {
+    if ('required' in rule && rule.required) {
         return validateFunc(rules.required, 'required');
     }
 
