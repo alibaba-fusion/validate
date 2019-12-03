@@ -3,13 +3,39 @@ import {
     complementError,
     asyncMap,
     asyncMapPromise,
-    serializeRules,
     processErrorResults,
 } from './util';
 import defaultMessages from './messages';
+import { getValidationMethod } from './validator';
 
 function noop() {}
+function serializeRules(source, rules) {
+    // serialize rules
+    let arr;
+    let value;
+    const series = {};
+    const names = Object.keys(rules);
+    names.forEach(name => {
+        arr = rules[name];
+        value = source[name];
 
+        if (!Array.isArray(arr)) {
+            arr = [arr];
+        }
+
+        arr.forEach(rule => {
+            rule.validator = getValidationMethod(rule);
+            rule.field = name;
+            if (!rule.validator) {
+                return;
+            }
+            series[name] = series[name] || [];
+            series[name].push({ rule, value, source, field: name });
+        });
+    });
+
+    return series;
+}
 class Schema {
     constructor(rules, options = {}) {
         this._rules = rules;

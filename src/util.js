@@ -1,5 +1,3 @@
-import { getValidationMethod } from './validator';
-
 const formatRegExp = /%[sdj%]/g;
 
 export function format(...args) {
@@ -147,34 +145,6 @@ export function complementError(rule) {
             field: rule.field,
         };
     };
-}
-
-export function serializeRules(source, rules) {
-    // serialize rules
-    let arr;
-    let value;
-    const series = {};
-    const names = Object.keys(rules);
-    names.forEach(name => {
-        arr = rules[name];
-        value = source[name];
-
-        if (!Array.isArray(arr)) {
-            arr = [arr];
-        }
-
-        arr.forEach(rule => {
-            rule.validator = getValidationMethod(rule);
-            rule.field = name;
-            if (!rule.validator) {
-                return;
-            }
-            series[name] = series[name] || [];
-            series[name].push({ rule, value, source, field: name });
-        });
-    });
-
-    return series;
 }
 
 /**
