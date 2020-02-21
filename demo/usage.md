@@ -12,7 +12,7 @@ const schema = new Validate({
   name: [
     {
         required: true,
-        aliasname: '用户名'
+        aliasName: '用户名'
     },
   ],
 });
