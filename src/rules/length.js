@@ -42,7 +42,7 @@ function length(rule, value, errors, options) {
             errors.push(
                 util.format(
                     options.messages[key].length,
-                    rule.field,
+                    rule.aliasname || rule.field,
                     rule.length
                 )
             );
@@ -50,7 +50,7 @@ function length(rule, value, errors, options) {
             errors.push(
                 util.format(
                     options.messages[key].minLength,
-                    rule.field,
+                    rule.aliasname || rule.field,
                     rule.minLength
                 )
             );
@@ -58,7 +58,7 @@ function length(rule, value, errors, options) {
             errors.push(
                 util.format(
                     options.messages[key].maxLength,
-                    rule.field,
+                    rule.aliasname || rule.field,
                     rule.maxLength
                 )
             );

@@ -52,7 +52,7 @@ function format(rule, value, errors, options) {
         errors.push(
             util.format(
                 options.messages.format[ruleType],
-                rule.field,
+                rule.aliasname || rule.field,
                 rule.format
             )
         );

@@ -35,11 +35,19 @@ function size(rule, value, errors, options) {
         }
         if (val < min) {
             errors.push(
-                util.format(options.messages[key].min, rule.field, rule.min)
+                util.format(
+                    options.messages[key].min,
+                    rule.aliasname || rule.field,
+                    rule.min
+                )
             );
         } else if (val > max) {
             errors.push(
-                util.format(options.messages[key].max, rule.field, rule.max)
+                util.format(
+                    options.messages[key].max,
+                    rule.aliasname || rule.field,
+                    rule.max
+                )
             );
         }
     }
