@@ -37,7 +37,7 @@ function size(rule, value, errors, options) {
             errors.push(
                 util.format(
                     options.messages[key].min,
-                    rule.aliasname || rule.field,
+                    rule.aliasName || rule.field,
                     rule.min
                 )
             );
@@ -45,7 +45,7 @@ function size(rule, value, errors, options) {
             errors.push(
                 util.format(
                     options.messages[key].max,
-                    rule.aliasname || rule.field,
+                    rule.aliasName || rule.field,
                     rule.max
                 )
             );

@@ -3,12 +3,12 @@ import Schema from '../src';
 
 /* global describe, it */
 describe('config', () => {
-    it.only('works with aliasname', done => {
+    it.only('works with aliasName', done => {
         const schema = new Schema({
             name: [
                 {
                     required: true,
-                    aliasname: '用户名'
+                    aliasName: '用户名'
                 },
             ],
         });
