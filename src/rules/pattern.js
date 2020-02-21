@@ -17,7 +17,7 @@ function pattern(rule, value, errors, options) {
                 errors.push(
                     util.format(
                         options.messages.pattern,
-                        rule.field,
+                        rule.aliasName || rule.field,
                         value,
                         rule.pattern
                     )
@@ -29,7 +29,7 @@ function pattern(rule, value, errors, options) {
                 errors.push(
                     util.format(
                         options.messages.pattern,
-                        rule.field,
+                        rule.aliasName || rule.field,
                         value,
                         rule.pattern
                     )

@@ -17,7 +17,9 @@ function required(rule, value, errors, options) {
         value === '' ||
         value.length === 0
     ) {
-        errors.push(util.format(options.messages.required, rule.field));
+        errors.push(
+            util.format(options.messages.required, rule.aliasName || rule.field)
+        );
     }
 }
 
