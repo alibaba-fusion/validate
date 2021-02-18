@@ -25,14 +25,16 @@ function size(rule, value, errors, options) {
         return false;
     }
 
-    let val = value;
-    const max = Number(rule.max);
-    const min = Number(rule.min);
+    // TODO: 2.x change to typeof rule.min === 'number' || typeof rule.max === 'number'
+    if (typeof rule.min !== 'undefined' || typeof rule.max !== 'undefined') {
+        let val = value;
+        const max = Number(rule.max);
+        const min = Number(rule.min);
 
-    if (min || max) {
         if (isStr) {
             val = Number(val);
         }
+
         if (val < min) {
             errors.push(
                 util.format(
