@@ -136,6 +136,26 @@ describe('size', () => {
                 }
             );
         });
+
+        it('error with min=0 or max=0', done => {
+            new Schema({
+                v: {
+                    min: 0,
+                },
+                v1: {
+                    max: 0,
+                },
+            }).validate(
+                {
+                    v: -1,
+                    v1: 1,
+                },
+                errors => {
+                    assert(errors.length === 2);
+                    done();
+                }
+            );
+        });
     })
 
     describe('validatePromise', () => {
