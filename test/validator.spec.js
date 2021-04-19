@@ -37,7 +37,7 @@ describe('validator', () => {
         );
     });
 
-    it('should return null when no errors', done => {
+    it('should return null when no errors undefiend/""/null', done => {
         new Schema({
             v: [
                 {
@@ -47,7 +47,12 @@ describe('validator', () => {
                 },
                 {
                     validator(rule, value, callback) {
-                        callback();
+                        callback("");
+                    },
+                },
+                {
+                    validator(rule, value, callback) {
+                        callback(null);
                     },
                 },
             ],
@@ -68,6 +73,7 @@ describe('validator', () => {
             }
         );
     });
+
 
     it('first works', done => {
         new Schema(

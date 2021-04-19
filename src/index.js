@@ -133,8 +133,14 @@ class Schema {
                 const rule = data.rule;
                 rule.field = data.field;
 
-                function cb(e = []) {
+                function cb(e) {
                     let errors = e;
+
+                    // fix e="" or null or undefiend
+                    if (!errors) {
+                        errors = [];
+                    }
+
                     if (!Array.isArray(errors)) {
                         errors = [errors];
                     }
@@ -151,7 +157,10 @@ class Schema {
 
                 const res = rule.validator(rule, data.value, cb, this._options);
                 if (res && res.then) {
-                    res.then(() => cb(), e => cb(e));
+                    res.then(
+                        () => cb(),
+                        e => cb(e)
+                    );
                 }
             },
             results => {
