@@ -136,8 +136,9 @@ class Schema {
                 function cb(e) {
                     let errors = e;
 
-                    // fix e="" or null or undefiend
-                    if (!errors) {
+                    // fix e=/""/null/undefiend.
+                    // ignore e=true/false;
+                    if (typeof errors !== 'boolean' && !errors) {
                         errors = [];
                     }
 
