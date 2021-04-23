@@ -37,7 +37,7 @@ describe('validator', () => {
         );
     });
 
-    it('should return no error when callback with false/undefiend/""/null', done => {
+    it('should return no error when callback with undefiend/""/null', done => {
         new Schema({
             v: [
                 {
