@@ -317,11 +317,11 @@ describe('format', () => {
             });
         });
 
-        describe('IDCard', () => {
+        describe('IDNumber', () => {
             it('works for empty string', done => {
                 new Schema({
                     v: {
-                        format: 'IDCard',
+                        format: 'IDNumber',
                     },
                 }).validate(
                     {
@@ -334,10 +334,10 @@ describe('format', () => {
                 );
             });
 
-            it('works for normal IDCard', done => {
+            it('works for normal IDNumber', done => {
                 new Schema({
                     v: {
-                        format: 'IDCard',
+                        format: 'IDNumber',
                     },
                 }).validate(
                     {
@@ -350,10 +350,10 @@ describe('format', () => {
                 );
             });
 
-            it('not valid IDCard', done => {
+            it('not valid IDNumber', done => {
                 new Schema({
                     v: {
-                        format: 'IDCard',
+                        format: 'IDNumber',
                     },
                 }).validate(
                     {
@@ -361,7 +361,7 @@ describe('format', () => {
                     },
                     errors => {
                         assert(errors.length === 1);
-                        assert(errors[0].message === 'v 不是合法的 IDCard');
+                        assert(errors[0].message === 'v 不是合法的 IDNumber');
                         done();
                     }
                 );

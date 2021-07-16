@@ -33,8 +33,8 @@ const types = {
     tel(value) {
         return typeof value === 'string' && !!value.match(pattern.tel);
     },
-    IDCard(value) {
-        return validatorIDCard(value);
+    IDNumber(value) {
+        return validatorIDNumber(value);
     },
 };
 
@@ -49,7 +49,7 @@ const types = {
  *  @param options.messages The validation messages.
  */
 function format(rule, value, errors, options) {
-    const custom = ['email', 'number', 'url', 'tel', 'IDCard'];
+    const custom = ['email', 'number', 'url', 'tel', 'IDNumber'];
     const ruleType = rule.format;
     if (custom.indexOf(ruleType) > -1 && !types[ruleType](value)) {
         errors.push(
@@ -78,7 +78,7 @@ function format(rule, value, errors, options) {
  *   十五，十六，十七都是数字0-9
  *   十八位可能是数字0-9，也可能是X
  * */
-function validatorIDCard(idCode) {
+function validatorIDNumber(idCode) {
     if (typeof idCode !== 'string') {
         return false;
     }
