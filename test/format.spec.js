@@ -316,6 +316,57 @@ describe('format', () => {
                 );
             });
         });
+
+        describe('IDCard', () => {
+            it('works for empty string', done => {
+                new Schema({
+                    v: {
+                        format: 'IDCard',
+                    },
+                }).validate(
+                    {
+                        v: '',
+                    },
+                    errors => {
+                        assert(errors === null);
+                        done();
+                    }
+                );
+            });
+
+            it('works for normal IDCard', done => {
+                new Schema({
+                    v: {
+                        format: 'IDCard',
+                    },
+                }).validate(
+                    {
+                        v: '53010219200508011X',
+                    },
+                    errors => {
+                        assert(errors === null);
+                        done();
+                    }
+                );
+            });
+
+            it('not valid IDCard', done => {
+                new Schema({
+                    v: {
+                        format: 'IDCard',
+                    },
+                }).validate(
+                    {
+                        v: '1234566789012309872',
+                    },
+                    errors => {
+                        assert(errors.length === 1);
+                        assert(errors[0].message === 'v 不是合法的 IDCard');
+                        done();
+                    }
+                );
+            });
+        });
     })
 
     describe('validatePromise', () => {
