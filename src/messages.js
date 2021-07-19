@@ -6,6 +6,7 @@ export default {
         email: '%s 不是合法的 email 地址',
         url: '%s 不是合法的 URL 地址',
         tel: '%s 不是合法的电话号码',
+        IDNumber: '%s 不是合法的身份证号码',
     },
     number: {
         length: '%s 长度必须是 %s',

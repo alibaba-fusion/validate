@@ -316,6 +316,57 @@ describe('format', () => {
                 );
             });
         });
+
+        describe('IDNumber', () => {
+            it('works for empty string', done => {
+                new Schema({
+                    v: {
+                        format: 'IDNumber',
+                    },
+                }).validate(
+                    {
+                        v: '',
+                    },
+                    errors => {
+                        assert(errors === null);
+                        done();
+                    }
+                );
+            });
+
+            it('works for normal IDNumber', done => {
+                new Schema({
+                    v: {
+                        format: 'IDNumber',
+                    },
+                }).validate(
+                    {
+                        v: '53010219200508011X',
+                    },
+                    errors => {
+                        assert(errors === null);
+                        done();
+                    }
+                );
+            });
+
+            it('not valid IDNumber', done => {
+                new Schema({
+                    v: {
+                        format: 'IDNumber',
+                    },
+                }).validate(
+                    {
+                        v: '1234566789012309872',
+                    },
+                    errors => {
+                        assert(errors.length === 1);
+                        assert(errors[0].message === 'v 不是合法的 IDNumber');
+                        done();
+                    }
+                );
+            });
+        });
     })
 
     describe('validatePromise', () => {
