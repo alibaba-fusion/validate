@@ -361,7 +361,7 @@ describe('format', () => {
                     },
                     errors => {
                         assert(errors.length === 1);
-                        assert(errors[0].message === 'v 不是合法的 IDNumber');
+                        assert(errors[0].message === 'v 不是合法的身份证号码');
                         done();
                     }
                 );
