@@ -168,6 +168,22 @@ describe('format', () => {
                     }
                 );
             });
+
+            it('works for chinese email', done => {
+                new Schema({
+                    v: {
+                        format: 'email',
+                    },
+                }).validate(
+                    {
+                        v: 'bindoon@sina.中国',
+                    },
+                    errors => {
+                        assert(errors === null);
+                        done();
+                    }
+                );
+            });
     
             it('not valid email', done => {
                 new Schema({
