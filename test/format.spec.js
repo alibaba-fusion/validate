@@ -197,6 +197,21 @@ describe('format', () => {
                     }
                 );
             });
+            it('should support localhost', done => {
+                new Schema({
+                    v: {
+                        format: 'url',
+                    },
+                }).validate(
+                    {
+                        v: '//localhost',
+                    },
+                    errors => {
+                        assert(errors === null);
+                        done();
+                    }
+                );
+            });
         });
     
         describe('email', () => {
