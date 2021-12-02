@@ -1,6 +1,14 @@
 import assert from 'power-assert';
 import Schema from '../src';
 
+const urlRules = (keys = []) => {
+    const obj = {};
+    keys.forEach(key => {
+        obj[key] = {format: 'url'};
+    });
+    return obj;
+};
+
 /* global describe, it */
 describe('format', () => {
 
@@ -10,7 +18,7 @@ describe('format', () => {
                 new Schema({
                     v: {
                         format: 'url',
-                    },
+                    }
                 }).validate(
                     {
                         v: '',
@@ -21,15 +29,58 @@ describe('format', () => {
                     }
                 );
             });
+
+            it('not works for space string', done => {
+                new Schema({
+                    v: {
+                        format: 'url',
+                    }
+                }).validate(
+                    {
+                        v: ' ',
+                    },
+                    errors => {
+                        assert(errors.length === 1);
+                        done();
+                    }
+                );
+            });
+
+            it('support http/https/ftp and no schema', done => {
+                new Schema(urlRules(['v1', 'v2', 'v3']))
+                .validate(
+                    {
+                        v1: 'http://www.taobao.com',
+                        v2: 'https://www.taobao.com',
+                        v3: 'ftp://www.taobao.com',
+                    },
+                    errors => {
+                        assert(errors === null);
+                        done();
+                    }
+                );
+            });
+
+            it('should support no schema', done => {
+                new Schema(urlRules(['v']))
+                .validate(
+                    {
+                        v: '//www.taobao.com',
+                    },
+                    errors => {
+                        assert(errors === null);
+                        done();
+                    }
+                );
+            });
     
             it('works for ip url', done => {
-                new Schema({
-                    v: {
-                        format: 'url',
-                    },
-                }).validate(
+                new Schema(urlRules(['v', 'v1', 'v2']))
+                .validate(
                     {
                         v: 'http://10.218.136.29/talent-tree/src/index.html',
+                        v1: 'https://10.218.136.29/talent-tree/src/index.html',
+                        v2: 'https://10.218.136.29:8000/talent-tree/src/index.html',
                     },
                     errors => {
                         assert(errors === null);
@@ -37,15 +88,13 @@ describe('format', () => {
                     }
                 );
             });
-    
-            it('works for type url', done => {
-                new Schema({
-                    v: {
-                        format: 'url',
-                    },
-                }).validate(
+
+            it('works for chinese url', done => {
+                new Schema(urlRules(['v', 'v1']))
+                .validate(
                     {
-                        v: 'http://www.taobao.com',
+                        v: 'http://中文.com',
+                        v1: 'http://中文.后缀',
                     },
                     errors => {
                         assert(errors === null);
@@ -53,7 +102,19 @@ describe('format', () => {
                     }
                 );
             });
-    
+            it('works for - url', done => {
+                new Schema(urlRules(['v', 'v1']))
+                .validate(
+                    {
+                        v: '//fusion-design.com',
+                        v1: '//fusion-design.ali-inc.com',
+                    },
+                    errors => {
+                        assert(errors === null);
+                        done();
+                    }
+                );
+            });
             it('works for type url has query', done => {
                 new Schema({
                     v: {
@@ -118,15 +179,32 @@ describe('format', () => {
                     }
                 );
             });
-    
-            it('support skip schema', done => {
+
+            it('should not timeout with complicated url', done => {
+                const url = 'https://item.taobao.com/item.htm?id=606535109270&ali_trackid=2:mm_12238993_19794510_110896800135:1637753061_136_624411470&union_lens=lensId:OPT@1637753056@6dcd3e84-67cc-4ee1-9dbc-00639596ecfa_606535109270@1;recoveryid:201_11.27.64.247_12983227_1637753058662;prepvid:201_11.27.64.247_12983227_1637753058662&spm=a231o.13503973.20618785.2&pvid=6dcd3e84-67cc-4ee1-9dbc-00639596ecfa&scm=1007.16016.217477.0&bxsign=tbkviNxf5b2kLFy42lYxfcooSjl4jfCk7bU52g4aDLoMBvTtXRlJVFhYZdJHDKQOOAlwjNBk91TjipSBf2/R6Y5B8O8qd/Hqs8CwaNRKD5abzg=';
+
                 new Schema({
                     v: {
                         format: 'url',
                     },
                 }).validate(
                     {
-                        v: '//g.cn',
+                        v: url,
+                    },
+                    errors => {
+                        assert(errors === null);
+                        done();
+                    }
+                );
+            });
+            it('should support localhost', done => {
+                new Schema({
+                    v: {
+                        format: 'url',
+                    },
+                }).validate(
+                    {
+                        v: '//localhost',
                     },
                     errors => {
                         assert(errors === null);
