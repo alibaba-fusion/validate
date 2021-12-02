@@ -1,10 +1,10 @@
 import assert from 'power-assert';
 import Schema from '../src';
 
-const urlRules = (keys = []) => {
+const urlRules = (keys = [], format = 'url') => {
     const obj = {};
     keys.forEach(key => {
-        obj[key] = {format: 'url'};
+        obj[key] = {format};
     });
     return obj;
 };
@@ -30,17 +30,19 @@ describe('format', () => {
                 );
             });
 
-            it('not works for space string', done => {
-                new Schema({
-                    v: {
-                        format: 'url',
-                    }
-                }).validate(
+            it('works for type not a valid url', done => {
+                new Schema(urlRules(['v', 'v1', 'v2', 'v3', 'v4']))
+                .validate(
                     {
                         v: ' ',
+                        v1: 'abcd',
+                        v2: 'http:/fusion.design',
+                        v3: 'http:fusion.design/',
+                        v4: 'http://www.taobao.com/abc?abc=%23&b=  a~c#abc    ',
                     },
                     errors => {
-                        assert(errors.length === 1);
+                        assert(errors.length === 5);
+                        assert(errors[0].message === 'v 不是合法的 URL 地址');
                         done();
                     }
                 );
@@ -102,7 +104,7 @@ describe('format', () => {
                     }
                 );
             });
-            it('works for - url', done => {
+            it('works for url with `-` ', done => {
                 new Schema(urlRules(['v', 'v1']))
                 .validate(
                     {
@@ -162,23 +164,6 @@ describe('format', () => {
                     }
                 );
             });
-    
-            it('works for type not a valid url', done => {
-                new Schema({
-                    v: {
-                        format: 'url',
-                    },
-                }).validate(
-                    {
-                        v: 'http://www.taobao.com/abc?abc=%23&b=  a~c#abc    ',
-                    },
-                    errors => {
-                        assert(errors.length === 1);
-                        assert(errors[0].message === 'v 不是合法的 URL 地址');
-                        done();
-                    }
-                );
-            });
 
             it('should not timeout with complicated url', done => {
                 const url = 'https://item.taobao.com/item.htm?id=606535109270&ali_trackid=2:mm_12238993_19794510_110896800135:1637753061_136_624411470&union_lens=lensId:OPT@1637753056@6dcd3e84-67cc-4ee1-9dbc-00639596ecfa_606535109270@1;recoveryid:201_11.27.64.247_12983227_1637753058662;prepvid:201_11.27.64.247_12983227_1637753058662&spm=a231o.13503973.20618785.2&pvid=6dcd3e84-67cc-4ee1-9dbc-00639596ecfa&scm=1007.16016.217477.0&bxsign=tbkviNxf5b2kLFy42lYxfcooSjl4jfCk7bU52g4aDLoMBvTtXRlJVFhYZdJHDKQOOAlwjNBk91TjipSBf2/R6Y5B8O8qd/Hqs8CwaNRKD5abzg=';
@@ -232,13 +217,12 @@ describe('format', () => {
             });
     
             it('works for normal email', done => {
-                new Schema({
-                    v: {
-                        format: 'email',
-                    },
-                }).validate(
+                new Schema(urlRules(['v', 'v1', 'v2'], 'email'))
+                .validate(
                     {
                         v: 'bindoon@sina.com',
+                        v1: 'qc.qc@alibaba-inc.com',
+                        v2: 'fusion-design@alibaba-inc.com'
                     },
                     errors => {
                         assert(errors === null);
@@ -248,13 +232,11 @@ describe('format', () => {
             });
 
             it('works for chinese email', done => {
-                new Schema({
-                    v: {
-                        format: 'email',
-                    },
-                }).validate(
+                new Schema(urlRules(['v', 'v1'], 'email'))
+                .validate(
                     {
                         v: 'bindoon@sina.中国',
+                        v1: '姓名@公司.中国'
                     },
                     errors => {
                         assert(errors === null);
@@ -264,16 +246,15 @@ describe('format', () => {
             });
     
             it('not valid email', done => {
-                new Schema({
-                    v: {
-                        format: 'email',
-                    },
-                }).validate(
+                new Schema(urlRules(['v', 'v1', 'v2'], 'email'))
+                .validate(
                     {
                         v: 'bindoon@sina .com',
+                        v1: 'bindoon',
+                        v2: 'a@a'
                     },
                     errors => {
-                        assert(errors.length === 1);
+                        assert(errors.length === 3);
                         assert(errors[0].message === 'v 不是合法的 email 地址');
                         done();
                     }
@@ -551,22 +532,6 @@ describe('format', () => {
                         v: 'http://www.taobao.com/abc?abc=%23&b=a~c#abc',
                     }).then(({errors}) => {
                         assert(errors === null);
-                        done();
-                    }
-                );
-            });
-    
-            it('works for type not a valid url', done => {
-                new Schema({
-                    v: {
-                        format: 'url',
-                    },
-                }).validatePromise(
-                    {
-                        v: 'http://www.taobao.com/abc?abc=%23&b=  a~c#abc    ',
-                    }).then(({errors}) => {
-                        assert(errors.length === 1);
-                        assert(errors[0].message === 'v 不是合法的 URL 地址');
                         done();
                     }
                 );
