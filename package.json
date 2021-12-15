@@ -12,7 +12,7 @@
     "start": "ice-scripts dev",
     "build": "ice-scripts build",
     "prepublishOnly": "npm run build",
-    "test": "ice-scripts test",
+    "test": "jest",
     "test-watch": "ice-scripts test --jest-watchAll",
     "precommit": "lint-staged",
     "eslint": "eslint '@(src|test)/**/*.@(js|jsx)'"
@@ -39,6 +39,7 @@
   ],
   "devDependencies": {
     "@alifd/eslint-config-next": "^2.0.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.16.5",
     "@commitlint/cli": "^8.1.0",
     "babel-eslint": "^10.0.2",
     "eslint": "^6.0.1",
@@ -50,6 +51,7 @@
     "ice-plugin-component": "^0.1.1",
     "ice-plugin-fusion": "^0.1.4",
     "ice-scripts": "^2.0.0",
+    "jest": "^27.4.5",
     "lint-staged": "^9.2.0",
     "mocha": "^6.1.4",
     "power-assert": "^1.6.1",
