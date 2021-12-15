@@ -36,7 +36,7 @@ export function format(...args) {
     return f;
 }
 
-function asyncSerialArray(arr, func, callback) {
+function _asyncSerialArray(arr, func, callback) {
     let index = 0;
     const arrLength = arr.length;
 
@@ -76,14 +76,14 @@ function flattenObjArr(objArr) {
  * 异步调用
  * @param  {map}   objArr   校验规则对象列表
  * @param  {object}   option   配置项
- * @param  {Function} func     每个校验规则
+ * @param  {Function} validator     每个校验规则
  * @param  {Function} callback 全部完成后的执行
  */
-export function asyncMap(objArr, option, func, callback) {
+export function asyncMap(objArr, option, validator, callback) {
     // 发现第一个错误即返回
     if (option.first) {
         const flattenArr = flattenObjArr(objArr);
-        return asyncSerialArray(flattenArr, func, callback);
+        return _asyncSerialArray(flattenArr, validator, callback);
     }
 
     const objArrKeys = Object.keys(objArr);
@@ -99,7 +99,7 @@ export function asyncMap(objArr, option, func, callback) {
     };
     objArrKeys.forEach(key => {
         const arr = objArr[key];
-        asyncSerialArray(arr, func, next);
+        _asyncSerialArray(arr, validator, next);
     });
 }
 

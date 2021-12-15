@@ -222,7 +222,7 @@ describe('format', () => {
                     {
                         v: 'bindoon@sina.com',
                         v1: 'qc.qc@alibaba-inc.com',
-                        v2: 'fusion-design@alibaba-inc.com'
+                        v2: 'fusion-design@list.alibaba-inc.com'
                     },
                     errors => {
                         assert(errors === null);
