@@ -470,4 +470,40 @@ describe('promise validator with promise callaback', () => {
         assert(Object.keys(fields).length === 1);
         assert.equal(errors[0].message, 'e1');
     });
+
+    it('should support validatePromise when validator use callback', async () => {
+        const validator = new Schema(
+            {
+                v: [
+                    {
+                        validator(_, value, callback) {
+                            assert(typeof callback === 'function')
+                            return Promise.reject('e1');
+                        },
+                    },
+                ],
+                v2: [
+                    {
+                        validator(_, value, callback) {
+                            callback('e2');
+                        },
+                    }
+                ],
+                v3: [
+                    {
+                        validator(_, value, callback) {
+                            callback('e3');
+                            return Promise.reject('e3')
+                        },
+                    }
+                ]
+            },
+        );
+        const { errors, fields } = await validator.validatePromise({ v: 's', v2: ''});
+        assert(errors.length === 3);
+        assert(Object.keys(fields).length === 3);
+        assert.equal(errors[0].message, 'e1');
+        assert.equal(errors[1].message, 'e2');
+        assert.equal(errors[2].message, 'e3');
+    })
 });

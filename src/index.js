@@ -9,6 +9,11 @@ import defaultMessages from './messages';
 import { getValidationMethod } from './validator';
 
 function noop() {}
+/**
+ * @param {Object} source {name: value, name2: value2}
+ * @param {Object} rules {name: [rule1, rule2]}
+ * @returns {name: [rule]}
+ */
 function serializeRules(source, rules) {
     // serialize rules
     let arr;
@@ -122,6 +127,8 @@ class Schema {
             callback(errors, fields);
         }
 
+        // 这里用数组的原因，是为了方便外部做 abort 调用
+        // eg: input onChange 时调用有 异步 validator 被异步调用多次，我们只取最后一次调用。否则可能出现 前一个 validator 返回导致
         this.complete.push(complete);
         const idx = this.complete.length;
 
@@ -198,17 +205,39 @@ class Schema {
                 let errors;
 
                 try {
-                    errors = await rule.validator(
-                        rule,
-                        data.value,
-                        null,
-                        this._options
-                    );
+                    errors = await new Promise((resolve, reject) => {
+                        function cb(e) {
+                            if (e) {
+                                reject(e);
+                            } else {
+                                resolve();
+                            }
+                        }
+
+                        const res = rule.validator(
+                            rule,
+                            data.value,
+                            cb,
+                            this._options
+                        );
+                        if (res && res.then) {
+                            res.then(
+                                () => cb(),
+                                e => cb(e)
+                            );
+                        }
+                    });
                 } catch (error) {
                     errors = error;
                 }
 
                 if (errors) {
+                    // fix e=/""/null/undefiend.
+                    // ignore e=true/false;
+                    if (typeof errors !== 'boolean' && !errors) {
+                        errors = [];
+                    }
+
                     if (!Array.isArray(errors)) {
                         errors = [errors];
                     }
