@@ -481,6 +481,12 @@ describe('promise validator with promise callaback', () => {
                             return Promise.reject('e1');
                         },
                     },
+                    {
+                        validator(_, value, callback) {
+                            assert(typeof callback === 'function')
+                            return Promise.reject('e1-1');
+                        },
+                    },
                 ],
                 v2: [
                     {
