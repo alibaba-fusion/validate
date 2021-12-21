@@ -12,7 +12,7 @@ function noop() {}
 /**
  * @param {Object} source {name: value, name2: value2}
  * @param {Object} rules {name: [rule1, rule2]}
- * @returns {name: [rule]}
+ * @returns {Object} {name:[{value,rule1},{value, rule2}]}
  */
 function serializeRules(source, rules) {
     // serialize rules
@@ -136,7 +136,7 @@ class Schema {
         asyncMap(
             series,
             this._options,
-            (data, doIt) => {
+            (data, next) => {
                 const rule = data.rule;
                 rule.field = data.field;
 
@@ -160,7 +160,7 @@ class Schema {
 
                     errors = errors.map(complementError(rule));
 
-                    doIt(errors);
+                    next(errors);
                 }
 
                 const res = rule.validator(rule, data.value, cb, this._options);
@@ -186,13 +186,13 @@ class Schema {
      */
     async validatePromise(source) {
         if (!this._rules || Object.keys(this._rules).length === 0) {
-            return Promise.resolve({ errors: null });
+            return { errors: null };
         }
 
         const series = serializeRules(source, this._rules);
 
         if (Object.keys(series).length === 0) {
-            return Promise.resolve({ errors: null });
+            return { errors: null };
         }
 
         const results = await asyncMapPromise(
@@ -207,11 +207,7 @@ class Schema {
                 try {
                     errors = await new Promise((resolve, reject) => {
                         function cb(e) {
-                            if (e) {
-                                reject(e);
-                            } else {
-                                resolve();
-                            }
+                            resolve(e);
                         }
 
                         const res = rule.validator(

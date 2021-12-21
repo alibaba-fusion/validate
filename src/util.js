@@ -36,19 +36,24 @@ export function format(...args) {
     return f;
 }
 
-function _asyncSerialArray(arr, func, callback) {
+/**
+ * 串联校验一组数据，只返回第一个出错结果
+ * @param {*} arr
+ * @param {*} validator
+ * @param {*} callback 出递归，告诉错误校验完成
+ */
+function _asyncValidateSerials(arr, validator, callback) {
     let index = 0;
     const arrLength = arr.length;
 
     function next(errors) {
         if (errors && errors.length) {
-            callback(errors);
-            return;
+            return callback(errors);
         }
         const original = index;
         index = index + 1;
         if (original < arrLength) {
-            func(arr[original], next);
+            validator(arr[original], next);
         } else {
             return callback([]);
         }
@@ -58,9 +63,32 @@ function _asyncSerialArray(arr, func, callback) {
 }
 
 /**
+ * 串联校验一组数据，只返回第一个出错结果
+ * @param {*} arr
+ * @param {*} validator
+ * @returns
+ */
+async function _promiseValidateSeries(arr, validator) {
+    return arr.reduce(async (prevPromise, next) => {
+        let errors;
+        try {
+            errors = await prevPromise;
+        } catch (e) {
+            errors = e;
+        }
+
+        if (errors && errors.length) {
+            return errors;
+        }
+
+        return validator(next);
+    }, []);
+}
+
+/**
  * 平铺规则
- * @param  {object} objArr [description]
- * @return {Array}        [description]
+ * @param  {object} objArr {name: [{value, rule}, {value, rule2}], name2: [{value2, rule3}]}
+ * @return {Array} [{value, rule}, {value, rule2}, {value2, rule3}]
  */
 function flattenObjArr(objArr) {
     const ret = [];
@@ -83,7 +111,7 @@ export function asyncMap(objArr, option, validator, callback) {
     // 发现第一个错误即返回
     if (option.first) {
         const flattenArr = flattenObjArr(objArr);
-        return _asyncSerialArray(flattenArr, validator, callback);
+        return _asyncValidateSerials(flattenArr, validator, callback);
     }
 
     const objArrKeys = Object.keys(objArr);
@@ -99,38 +127,21 @@ export function asyncMap(objArr, option, validator, callback) {
     };
     objArrKeys.forEach(key => {
         const arr = objArr[key];
-        _asyncSerialArray(arr, validator, next);
+        _asyncValidateSerials(arr, validator, next);
     });
 }
 
-async function resolveErrorPromiseInSeries(arr, func) {
-    return arr.reduce(async (prevPromise, next) => {
-        let errors;
-        try {
-            errors = await prevPromise;
-        } catch (e) {
-            errors = e;
-        }
-
-        if (errors && errors.length) {
-            return errors;
-        }
-
-        return func(next);
-    }, Promise.resolve());
-}
-
-export async function asyncMapPromise(objArr, option, func) {
+export async function asyncMapPromise(objArr, option, validator) {
     if (option.first) {
         const flatObjArr = flattenObjArr(objArr);
 
-        return resolveErrorPromiseInSeries(flatObjArr, func);
+        return await _promiseValidateSeries(flatObjArr, validator);
     }
 
     const objArrValues = Object.values(objArr);
 
-    return Promise.all(
-        objArrValues.map(val => resolveErrorPromiseInSeries(val, func))
+    return await Promise.all(
+        objArrValues.map(val => _promiseValidateSeries(val, validator))
     );
 }
 
