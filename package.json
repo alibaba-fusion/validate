@@ -53,7 +53,7 @@
     "ice-scripts": "^2.0.0",
     "jest": "^27.4.5",
     "lint-staged": "^9.2.0",
-    "mocha": "^6.1.4",
+    "mocha": "^10.2.0",
     "power-assert": "^1.6.1",
     "prettier": "^1.18.2",
     "react": "^16.3.0",
