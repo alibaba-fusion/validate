@@ -3,7 +3,13 @@
         "es6": true,
         "node": true
     },
-    "extends": ["@alifd/eslint-config-next", "prettier"],
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+        "@alifd/eslint-config-next",
+        "plugin:@typescript-eslint/recommended",
+        "prettier"
+    ],
+    "plugins": ["@typescript-eslint"],
     "rules": {
         "valid-jsdoc": "off",
         "max-statements": "off",
