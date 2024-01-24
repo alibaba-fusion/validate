@@ -1,9 +1,8 @@
-import assert from 'power-assert';
+import { assert } from 'chai';
 import Schema from '../src/index';
 
-/* global describe, it */
 describe('validator', () => {
-    it('works', done => {
+    it('works', (done) => {
         new Schema({
             v: [
                 {
@@ -28,7 +27,8 @@ describe('validator', () => {
             {
                 v: 2,
             },
-            errors => {
+            (errors) => {
+                assert(errors);
                 assert(errors.length === 2);
                 assert(errors[0].message === 'e1');
                 assert(errors[1].message === 'e3');
@@ -37,8 +37,8 @@ describe('validator', () => {
         );
     });
 
-    it('should return no error when callback with undefiend/""/null', done => {
-        new Schema({
+    it('should return no error when callback with undefiend/""/null', async () => {
+        const schema = new Schema({
             v: [
                 {
                     validator(rule, value, callback) {
@@ -47,7 +47,7 @@ describe('validator', () => {
                 },
                 {
                     validator(rule, value, callback) {
-                        callback("");
+                        callback('');
                     },
                 },
                 {
@@ -68,19 +68,23 @@ describe('validator', () => {
                     },
                 },
             ],
-        }).validate(
-            {
-                v: 2,
-            },
-            errors => {
-                assert.equal(errors, null);
-                done();
-            }
-        );
+        });
+        await new Promise<void>((resolve) => {
+            schema.validate(
+                {
+                    v: 2,
+                },
+                (errors) => {
+                    assert.equal(errors, null);
+                    resolve();
+                }
+            );
+        });
+        const { errors } = await schema.validate({ v: 2 });
+        assert(errors === null);
     });
 
-
-    it('first works', done => {
+    it('first works', (done) => {
         new Schema(
             {
                 v: [
@@ -109,7 +113,8 @@ describe('validator', () => {
                 v: 2,
                 v2: 1,
             },
-            errors => {
+            (errors) => {
+                assert(errors);
                 assert(errors.length === 1);
                 assert(errors[0].message === 'e1');
                 done();
@@ -117,7 +122,7 @@ describe('validator', () => {
         );
     });
 
-    it('passes value on resolve', done => {
+    it('passes value on resolve', (done) => {
         new Schema({
             v: [
                 {
@@ -142,7 +147,8 @@ describe('validator', () => {
             {
                 v: 2,
             },
-            errors => {
+            (errors) => {
+                assert(errors);
                 assert(errors.length === 2);
                 assert(errors[0].message === 'e1');
                 assert(errors[1].message === 'e3');
@@ -153,7 +159,7 @@ describe('validator', () => {
 });
 
 describe('promise validator', () => {
-    it('works with reject', done => {
+    it('works with reject', (done) => {
         new Schema({
             v: [
                 {
@@ -178,7 +184,8 @@ describe('promise validator', () => {
             {
                 v: 2,
             },
-            errors => {
+            (errors) => {
+                assert(errors);
                 assert(errors.length === 2);
                 assert(errors[0].message === 'e1');
                 assert(errors[1].message === 'e3');
@@ -187,7 +194,7 @@ describe('promise validator', () => {
         );
     });
 
-    it('works with resolve', done => {
+    it('works with resolve', (done) => {
         new Schema({
             v: [
                 {
@@ -212,14 +219,14 @@ describe('promise validator', () => {
             {
                 v: 2,
             },
-            errors => {
+            (errors) => {
                 assert.equal(errors, null);
                 done();
             }
         );
     });
 
-    it('should return null when no errors', done => {
+    it('should return null when no errors', (done) => {
         new Schema({
             v: [
                 {
@@ -244,14 +251,14 @@ describe('promise validator', () => {
             {
                 v: 2,
             },
-            errors => {
+            (errors) => {
                 assert.equal(errors, null);
                 done();
             }
         );
     });
 
-    it('first works', done => {
+    it('first works', (done) => {
         new Schema(
             {
                 v: [
@@ -280,7 +287,8 @@ describe('promise validator', () => {
                 v: 2,
                 v2: 1,
             },
-            errors => {
+            (errors) => {
+                assert(errors);
                 assert(errors.length === 1);
                 assert(errors[0].message === 'e1');
                 done();
@@ -289,41 +297,32 @@ describe('promise validator', () => {
     });
 });
 
-describe('promise validator with promise callaback', () => {
+describe('promise validator with promise callback', () => {
     it('should resolve promise with null when no rules', async () => {
-        const validator = new Schema({})
-        const { errors } = await validator.validate(
-            {
-                v: 2,
-            }
-        );
+        const validator = new Schema({});
+        const { errors } = await validator.validate({
+            v: 2,
+        });
 
         assert.equal(errors, null);
     });
 
     it('should resolve promise with null when no rules and no callback', async () => {
-        const validator = new Schema({})
-        const {errors} = await validator.validate(
-            {
-                v: 2,
-            },
-        );
+        const validator = new Schema({});
+        const { errors } = await validator.validate({
+            v: 2,
+        });
 
         assert.equal(errors, null);
     });
 
     it('should resolve promise with null when rules with validators', async () => {
         const validator = new Schema({
-            v: [
-                {
-                },
-            ],
-        })
-        const {errors} = await validator.validate(
-            {
-                v: 2,
-            }
-        );
+            v: [{}],
+        });
+        const { errors } = await validator.validate({
+            v: 2,
+        });
 
         assert.equal(errors, null);
     });
@@ -351,12 +350,10 @@ describe('promise validator with promise callaback', () => {
                     },
                 },
             ],
-        })
-        const { errors } = await validator.validate(
-            {
-                v: 2,
-            }
-        );
+        });
+        const { errors } = await validator.validate({
+            v: 2,
+        });
 
         assert.deepEqual(errors, null);
     });
@@ -382,19 +379,35 @@ describe('promise validator with promise callaback', () => {
                     },
                 },
             ],
-        })
+        });
 
-        const { errors, fields } = await validator.validate(
-            {
-                v: 2,
-            }
-        );
+        const { errors, fields } = await validator.validate({
+            v: 2,
+        });
 
-        
+        assert(errors);
         assert(errors.length === 2);
         assert(Object.keys(fields).length === 2);
         assert.equal(errors[0].message, 'e1');
         assert.equal(errors[1].message, 'e3');
+    });
+
+    it('should resolve with errors and fields when rules throw error', async () => {
+        const schema = new Schema({
+            name: [
+                {
+                    aliasName: '用户名',
+                    validator: () => {
+                        throw new Error('haha');
+                    },
+                },
+            ],
+        });
+        const { errors, fields } = await schema.validate({ name: '' });
+        assert(errors);
+        assert(errors.length === 1);
+        assert(errors[0].message === 'haha');
+        assert(Object.keys(fields).length === 1);
     });
 
     it('should resolve with errors and fields when rules reject with value', async () => {
@@ -418,15 +431,13 @@ describe('promise validator with promise callaback', () => {
                     },
                 },
             ],
-        })
+        });
 
-        const { errors, fields } = await validator.validate(
-            {
-                v: 2,
-            }
-        );
+        const { errors, fields } = await validator.validate({
+            v: 2,
+        });
 
-        
+        assert(errors);
         assert(errors.length === 2);
         assert(Object.keys(fields).length === 2);
         assert.equal(errors[0].message, 'e1');
@@ -457,59 +468,60 @@ describe('promise validator with promise callaback', () => {
                 ],
             },
             { first: true }
-        )
-        
-        const { errors, fields } = await validator.validate(
-            {
-                v: 2,
-                v2: 1,
-            }
         );
 
+        const { errors, fields } = await validator.validate({
+            v: 2,
+            v2: 1,
+        });
+
+        assert(errors);
         assert(errors.length === 1);
         assert(Object.keys(fields).length === 1);
         assert.equal(errors[0].message, 'e1');
     });
 
     it('should support validatePromise when validator use callback', async () => {
-        const validator = new Schema(
-            {
-                v: [
-                    {
-                        validator(_, value, callback) {
-                            assert(typeof callback === 'function')
-                            return Promise.reject('e1');
-                        },
+        const validator = new Schema({
+            v: [
+                {
+                    validator(_, value, callback) {
+                        assert(typeof callback === 'function');
+                        return Promise.reject('e1');
                     },
-                    {
-                        validator(_, value, callback) {
-                            assert(typeof callback === 'function')
-                            return Promise.reject('e1-1');
-                        },
+                },
+                {
+                    validator(_, value, callback) {
+                        assert(typeof callback === 'function');
+                        return Promise.reject('e1-1');
                     },
-                ],
-                v2: [
-                    {
-                        validator(_, value, callback) {
-                            callback('e2');
-                        },
-                    }
-                ],
-                v3: [
-                    {
-                        validator(_, value, callback) {
-                            callback('e3');
-                            return Promise.reject('e3')
-                        },
-                    }
-                ]
-            },
-        );
-        const { errors, fields } = await validator.validatePromise({ v: 's', v2: ''});
+                },
+            ],
+            v2: [
+                {
+                    validator(_, value, callback) {
+                        callback('e2');
+                    },
+                },
+            ],
+            v3: [
+                {
+                    validator(_, value, callback) {
+                        callback('e3');
+                        return Promise.reject('e3');
+                    },
+                },
+            ],
+        });
+        const { errors, fields } = await validator.validatePromise({
+            v: 's',
+            v2: '',
+        });
+        assert(errors);
         assert(errors.length === 3);
         assert(Object.keys(fields).length === 3);
         assert.equal(errors[0].message, 'e1');
         assert.equal(errors[1].message, 'e2');
         assert.equal(errors[2].message, 'e3');
-    })
+    });
 });

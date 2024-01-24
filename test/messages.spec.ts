@@ -1,11 +1,11 @@
-import assert from 'power-assert';
+import { assert } from 'chai';
 import Schema from '../src';
+import { MessagesConfig } from '../src/types';
 
-/* global describe, it */
 describe('messages', () => {
     describe('validate', () => {
-        it('can call messages', done => {
-            const messages = {
+        it('can call messages', (done) => {
+            const messages: MessagesConfig = {
                 required(f) {
                     return `${f} required!`;
                 },
@@ -24,7 +24,8 @@ describe('messages', () => {
                     v: '',
                     v2: '1',
                 },
-                errors => {
+                (errors) => {
+                    assert(errors);
                     assert(errors.length === 2);
                     assert(errors[0].message === 'v required!');
                     assert(errors[1].message === 'v2 字段字符长度不得少于 2');
@@ -33,9 +34,9 @@ describe('messages', () => {
                 }
             );
         });
-    
-        it('can use options.messages', done => {
-            const messages = {
+
+        it('can use options.messages', (done) => {
+            const messages: MessagesConfig = {
                 required(f) {
                     return `${f} required!`;
                 },
@@ -58,7 +59,8 @@ describe('messages', () => {
                     v: '',
                     v2: '1',
                 },
-                errors => {
+                (errors) => {
+                    assert(errors);
                     assert(errors.length === 2);
                     assert(errors[0].message === 'v required!');
                     assert(errors[1].message === 'v2 字段数值不得小于 2');
@@ -67,8 +69,8 @@ describe('messages', () => {
                 }
             );
         });
-    
-        it('message can be object', done => {
+
+        it('message can be object', (done) => {
             const atom = {};
             const messages = {
                 required: atom,
@@ -87,7 +89,7 @@ describe('messages', () => {
                 {
                     v: '',
                 },
-                errors => {
+                (errors) => {
                     assert(errors);
                     assert(errors.length === 1);
                     assert(errors[0].message === atom);
@@ -97,11 +99,11 @@ describe('messages', () => {
                 }
             );
         });
-    })
+    });
 
     describe('validatePromise', () => {
-        it('can call messages', done => {
-            const messages = {
+        it('can call messages', (done) => {
+            const messages: MessagesConfig = {
                 required(f) {
                     return `${f} required!`;
                 },
@@ -115,22 +117,23 @@ describe('messages', () => {
                 },
             });
             schema.messages(messages);
-            schema.validatePromise(
-                {
+            schema
+                .validatePromise({
                     v: '',
                     v2: '1',
-                }).then(({errors}) => {
+                })
+                .then(({ errors }) => {
+                    assert(errors);
                     assert(errors.length === 2);
                     assert(errors[0].message === 'v required!');
                     assert(errors[1].message === 'v2 字段字符长度不得少于 2');
                     assert(Object.keys(messages).length === 1);
                     done();
-                }
-            );
+                });
         });
-    
-        it('can use options.messages', done => {
-            const messages = {
+
+        it('can use options.messages', (done) => {
+            const messages: MessagesConfig = {
                 required(f) {
                     return `${f} required!`;
                 },
@@ -148,21 +151,22 @@ describe('messages', () => {
                     messages,
                 }
             );
-            schema.validatePromise(
-                {
+            schema
+                .validatePromise({
                     v: '',
                     v2: '1',
-                }).then(({errors}) => {
+                })
+                .then(({ errors }) => {
+                    assert(errors);
                     assert(errors.length === 2);
                     assert(errors[0].message === 'v required!');
                     assert(errors[1].message === 'v2 字段数值不得小于 2');
                     assert(Object.keys(messages).length === 1);
                     done();
-                }
-            );
+                });
         });
-    
-        it('message can be object', done => {
+
+        it('message can be object', (done) => {
             const atom = {};
             const messages = {
                 required: atom,
@@ -177,18 +181,18 @@ describe('messages', () => {
                     messages,
                 }
             );
-            schema.validatePromise(
-                {
+            schema
+                .validatePromise({
                     v: '',
-                }).then(({errors}) => {
+                })
+                .then(({ errors }) => {
                     assert(errors);
                     assert(errors.length === 1);
                     assert(errors[0].message === atom);
                     assert(Object.keys(messages).length === 1);
                     assert(messages.required === atom);
                     done();
-                }
-            );
+                });
         });
-    })
+    });
 });
