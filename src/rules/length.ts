@@ -1,4 +1,5 @@
 import * as util from '../util';
+import { PresetValidator } from '../types';
 
 /**
  *  Rule for validating minimum and maximum allowed values.
@@ -10,8 +11,13 @@ import * as util from '../util';
  *  @param options The validation options.
  *  @param options.messages The validation messages.
  */
-function length(rule, value, errors, options) {
-    let key = null;
+const length: PresetValidator = function length(
+    rule,
+    value: string | number | unknown[],
+    errors,
+    options
+) {
+    let key: 'number' | 'string' | 'array' | null = null;
     const isNum = typeof value === 'number';
     const isStr = typeof value === 'string';
     const isArr = Array.isArray(value);
@@ -28,17 +34,14 @@ function length(rule, value, errors, options) {
         return false;
     }
 
-    let val = value;
+    const val = isNum ? `${value}` : value;
     const length = Number(rule.length);
     const maxLength = Number(rule.maxLength);
     const minLength = Number(rule.minLength);
 
     if (minLength || maxLength || length) {
-        if (isNum) {
-            val = `${val}`;
-        }
-        val = val.length;
-        if (length && val !== rule.length) {
+        const len = val.length;
+        if (length && len !== rule.length) {
             errors.push(
                 util.format(
                     options.messages[key].length,
@@ -46,7 +49,7 @@ function length(rule, value, errors, options) {
                     rule.length
                 )
             );
-        } else if (val < minLength) {
+        } else if (len < minLength) {
             errors.push(
                 util.format(
                     options.messages[key].minLength,
@@ -54,7 +57,7 @@ function length(rule, value, errors, options) {
                     rule.minLength
                 )
             );
-        } else if (val > maxLength) {
+        } else if (len > maxLength) {
             errors.push(
                 util.format(
                     options.messages[key].maxLength,
@@ -64,6 +67,6 @@ function length(rule, value, errors, options) {
             );
         }
     }
-}
+};
 
 export default length;

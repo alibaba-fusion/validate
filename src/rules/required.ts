@@ -1,4 +1,5 @@
 import * as util from '../util';
+import { PresetValidator } from '../types';
 
 /**
  *  Rule for validating required fields.
@@ -10,17 +11,22 @@ import * as util from '../util';
  *  @param options The validation options.
  *  @param options.messages The validation messages.
  */
-function required(rule, value, errors, options) {
+const required: PresetValidator = function required(
+    rule,
+    value,
+    errors,
+    options
+) {
     if (
         value === undefined ||
         value === null ||
         value === '' ||
-        value.length === 0
+        (value as { length: number }).length === 0
     ) {
         errors.push(
             util.format(options.messages.required, rule.aliasName || rule.field)
         );
     }
-}
+};
 
 export default required;

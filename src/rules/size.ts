@@ -1,4 +1,5 @@
 import * as util from '../util';
+import { PresetValidator } from '../types';
 
 /**
  *  Rule for validating minimum and maximum allowed values.
@@ -10,8 +11,8 @@ import * as util from '../util';
  *  @param options The validation options.
  *  @param options.messages The validation messages.
  */
-function size(rule, value, errors, options) {
-    let key = null;
+const size: PresetValidator = function size(rule, value, errors, options) {
+    let key: 'number' | 'string' | null = null;
     const isNum = typeof value === 'number';
     const isStr = typeof value === 'string';
 
@@ -27,7 +28,7 @@ function size(rule, value, errors, options) {
 
     // TODO: 2.x change to typeof rule.min === 'number' || typeof rule.max === 'number'
     if (typeof rule.min !== 'undefined' || typeof rule.max !== 'undefined') {
-        let val = value;
+        let val = value as number;
         const max = Number(rule.max);
         const min = Number(rule.min);
 
@@ -53,6 +54,6 @@ function size(rule, value, errors, options) {
             );
         }
     }
-}
+};
 
 export default size;

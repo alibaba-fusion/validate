@@ -1,9 +1,9 @@
-import assert from 'power-assert';
+import { assert } from 'chai';
+import { spy } from 'sinon';
 import Schema from '../src';
 
-/* global describe, it */
 describe('abort', () => {
-    it('works with abort', done => {
+    it('works with abort', (done) => {
         const schema = new Schema({
             v: [
                 {
@@ -15,13 +15,14 @@ describe('abort', () => {
                 },
             ],
         });
+        const callback = spy();
 
         schema.validate(
             {
                 v: 2,
             },
             () => {
-                assert('should not be here' === '');
+                callback();
                 done();
             }
         );
@@ -32,7 +33,9 @@ describe('abort', () => {
             {
                 v: 3,
             },
-            errors => {
+            (errors) => {
+                assert(!callback.called);
+                assert(errors);
                 assert(errors.length === 1);
                 done();
             }

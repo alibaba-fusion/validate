@@ -5,9 +5,9 @@
     "singleQuote": true,
     "overrides": [
         {
-            "files": "*.d.ts",
+            "files": "package.json",
             "options": {
-                "parser": "typescript"
+                "tabWidth": 2
             }
         }
     ]

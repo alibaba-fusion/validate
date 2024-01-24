@@ -7,7 +7,7 @@
         "moduleResolution": "Node",
         "experimentalDecorators": true,
         "declaration": true,
-        "allowJs": true,
+        "allowJs": false,
         "downlevelIteration": true,
         "noImplicitAny": true,
         "strictNullChecks": true,

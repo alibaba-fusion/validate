@@ -1,23 +1,28 @@
-/* eslint-disable callback-return */
-import rules from './rules/';
+import {
+    PresetOption,
+    PresetValidator,
+    Rule,
+    ValidateError,
+    Validator,
+} from './types';
+import rules from './rules';
 
 /**
  * {required, format} => format; {required} => required
  * If a promise is wanted from the validator, either return a promise from the callback,
  *      or do not pass a callback
- *
- * @param  {function} validator [description]
- * @param  {string} ruleType  [description]
- * @return {function}           [description]
  */
-export function validateFunc(validator, ruleType) {
+export function validateFunc(
+    validator: PresetValidator,
+    ruleType: string
+): Validator {
     return (rule, value, cb, options) => {
-        const errors = [];
+        const errors: ValidateError[] = [];
 
-        // 如果是非required校验
+        // 如果是非 required 校验
         if (ruleType !== 'required') {
-            const errors = [];
-            rules.required(rule, value, errors, options);
+            const errors: Array<ValidateError | string> = [];
+            rules.required(rule, value, errors, options as PresetOption);
             // 空数据
             if (errors.length > 0) {
                 if ('required' in rule && rule.required) {
@@ -27,14 +32,14 @@ export function validateFunc(validator, ruleType) {
                         return Promise.reject(errors);
                     }
                 } else if (cb) {
-                    return cb([]); //空数据，并且没有require要求，则忽略
+                    return cb([]); //空数据，并且没有 require 要求，则忽略
                 } else {
                     return Promise.resolve(null);
                 }
             }
         }
 
-        validator(rule, value, errors, options);
+        validator(rule, value, errors, options as PresetOption);
         if (cb) {
             return cb(errors);
         }
@@ -46,20 +51,18 @@ export function validateFunc(validator, ruleType) {
 
 /**
  * {required, format} => format; {required} => required
- * @param  {object} rule [description]
- * @return {function}      [description]
  */
-export function getValidationMethod(rule) {
+export function getValidationMethod(rule: Rule) {
     if (typeof rule.validator === 'function') {
         return rule.validator;
     }
 
     const keys = Object.keys(rule);
 
-    //required和其他校验规则共存
-    //{required, format} {required, unknown}
+    // required 和其他校验规则共存
+    // {required, format} {required, unknown}
     for (let i = 0; i < keys.length; i++) {
-        const ruleType = keys[i];
+        const ruleType = keys[i] as keyof typeof rules;
 
         if (ruleType === 'required') {
             continue;

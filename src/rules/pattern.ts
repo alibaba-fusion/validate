@@ -1,4 +1,5 @@
 import * as util from '../util';
+import { PresetValidator } from '../types';
 
 /**
  *  Rule for validating a regular expression pattern.
@@ -10,7 +11,12 @@ import * as util from '../util';
  *  @param options The validation options.
  *  @param options.messages The validation messages.
  */
-function pattern(rule, value, errors, options) {
+const pattern: PresetValidator = function pattern(
+    rule,
+    value: string,
+    errors,
+    options
+) {
     if (rule.pattern) {
         if (rule.pattern instanceof RegExp) {
             if (!rule.pattern.test(value)) {
@@ -37,6 +43,6 @@ function pattern(rule, value, errors, options) {
             }
         }
     }
-}
+};
 
 export default pattern;

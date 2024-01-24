@@ -1,10 +1,9 @@
-import assert from 'power-assert';
+import { assert } from 'chai';
 import Schema from '../src';
 
-/* global describe, it */
 describe('unknow usage', () => {
     describe('validate', () => {
-        it('works with unknow rule', done => {
+        it('works with unknow rule', (done) => {
             new Schema({
                 v: {
                     unknow: 'number',
@@ -13,14 +12,14 @@ describe('unknow usage', () => {
                 {
                     v: '1',
                 },
-                errors => {
+                (errors) => {
                     assert(errors === null);
                     done();
                 }
             );
         });
-    
-        it('noerror with required with other unknow rules', done => {
+
+        it('noerror with required with other unknow rules', (done) => {
             new Schema({
                 v: {
                     required: true,
@@ -30,14 +29,14 @@ describe('unknow usage', () => {
                 {
                     v: '1',
                 },
-                errors => {
+                (errors) => {
                     assert(errors === null);
                     done();
                 }
             );
         });
-    
-        it('error with required with other unknow rules', done => {
+
+        it('error with required with other unknow rules', (done) => {
             new Schema({
                 v: {
                     required: true,
@@ -47,15 +46,16 @@ describe('unknow usage', () => {
                 {
                     v: '',
                 },
-                errors => {
+                (errors) => {
+                    assert(errors);
                     assert(errors.length === 1);
                     assert(errors[0].message === 'v 是必填字段');
                     done();
                 }
             );
         });
-    
-        it('noerror with required and other rule', done => {
+
+        it('noerror with required and other rule', (done) => {
             new Schema({
                 v: {
                     required: true,
@@ -65,14 +65,14 @@ describe('unknow usage', () => {
                 {
                     v: '1',
                 },
-                errors => {
+                (errors) => {
                     assert(errors === null);
                     done();
                 }
             );
         });
-    
-        it('error with required and other rules', done => {
+
+        it('error with required and other rules', (done) => {
             new Schema({
                 v: {
                     required: true,
@@ -83,119 +83,122 @@ describe('unknow usage', () => {
                 {
                     v: 'abcd',
                 },
-                errors => {
+                (errors) => {
+                    assert(errors);
                     assert(errors.length === 1);
                     assert(errors[0].message === 'haha');
                     done();
                 }
             );
         });
-    
-        it('error with no rules', done => {
+
+        it('error with no rules', (done) => {
             new Schema({}).validate(
                 {
                     v: 'abcd',
                 },
-                errors => {
+                (errors) => {
                     assert(errors === null);
                     done();
                 }
             );
         });
-    })
+    });
 
     describe('validatePromise', () => {
-        it('works with unknow rule', done => {
+        it('works with unknow rule', (done) => {
             new Schema({
                 v: {
                     unknow: 'number',
                 },
-            }).validatePromise(
-                {
+            })
+                .validatePromise({
                     v: '1',
-                }).then(({errors}) => {
+                })
+                .then(({ errors }) => {
                     assert(errors === null);
                     done();
-                }
-            );
+                });
         });
-    
-        it('noerror with required with other unknow rules', done => {
+
+        it('noerror with required with other unknow rules', (done) => {
             new Schema({
                 v: {
                     required: true,
                     unknow: 'number',
                 },
-            }).validatePromise(
-                {
+            })
+                .validatePromise({
                     v: '1',
-                }).then(({errors}) => {
+                })
+                .then(({ errors }) => {
                     assert(errors === null);
                     done();
-                }
-            );
+                });
         });
-    
-        it('error with required with other unknow rules', done => {
+
+        it('error with required with other unknow rules', (done) => {
             new Schema({
                 v: {
                     required: true,
                     unknow: 'number',
                 },
-            }).validatePromise(
-                {
+            })
+                .validatePromise({
                     v: '',
-                }).then(({errors}) => {
+                })
+                .then(({ errors }) => {
+                    assert(errors);
                     assert(errors.length === 1);
                     assert(errors[0].message === 'v 是必填字段');
                     done();
-                }
-            );
+                });
         });
-    
-        it('noerror with required and other rule', done => {
+
+        it('noerror with required and other rule', (done) => {
             new Schema({
                 v: {
                     required: true,
                     format: 'number',
                 },
-            }).validatePromise(
-                {
+            })
+                .validatePromise({
                     v: '1',
-                }).then(({errors}) => {
+                })
+                .then(({ errors }) => {
                     assert(errors === null);
                     done();
-                }
-            );
+                });
         });
-    
-        it('error with required and other rules', done => {
+
+        it('error with required and other rules', (done) => {
             new Schema({
                 v: {
                     required: true,
                     format: 'number',
                     message: 'haha',
                 },
-            }).validatePromise(
-                {
+            })
+                .validatePromise({
                     v: 'abcd',
-                }).then(({errors}) => {
+                })
+                .then(({ errors }) => {
+                    assert(errors);
                     assert(errors.length === 1);
                     assert(errors[0].message === 'haha');
                     done();
-                }
-            );
+                });
         });
-    
-        it('error with no rules', done => {
-            new Schema({}).validatePromise(
-                {
+
+        it('error with no rules', (done) => {
+            new Schema({})
+                .validatePromise({
                     v: 'abcd',
-                }).then(({errors}) => {
+                })
+                .then(({ errors }) => {
                     assert(errors === null);
                     done();
-                }
-            );
+                });
         });
-    })
+    });
 });

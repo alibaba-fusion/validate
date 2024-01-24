@@ -1,6 +1,15 @@
+import {
+    NormalizedValidateError,
+    SerializedRule,
+    ValidateError,
+} from './types';
+
 const formatRegExp = /%[sdj%]/g;
 
-export function format(...args) {
+export function format<R>(f: () => R, ...args: unknown[]): R;
+export function format(f: string, ...args: unknown[]): string;
+export function format<V>(f: V, ...args: unknown[]): V;
+export function format(...args: [unknown, ...others: unknown[]]): unknown {
     let i = 1;
     const f = args[0];
     const len = args.length;
@@ -8,7 +17,7 @@ export function format(...args) {
         return f(args.slice(1));
     }
     if (typeof f === 'string') {
-        const str = String(f).replace(formatRegExp, x => {
+        const str = String(f).replace(formatRegExp, (x) => {
             if (x === '%%') {
                 return '%';
             }
@@ -19,7 +28,7 @@ export function format(...args) {
                 case '%s':
                     return String(args[i++]);
                 case '%d':
-                    return Number(args[i++]);
+                    return Number(args[i++]) as unknown as string;
                 case '%j':
                     try {
                         return JSON.stringify(args[i++]);
@@ -38,15 +47,22 @@ export function format(...args) {
 
 /**
  * 串联校验一组数据，只返回第一个出错结果
- * @param {*} arr
- * @param {*} validator
- * @param {*} callback 出递归，告诉错误校验完成
+ * @param arr
+ * @param validator
+ * @param callback 出递归，告诉错误校验完成
  */
-function _asyncValidateSerials(arr, validator, callback) {
+function _asyncValidateSerials<Item, ErrorItem>(
+    arr: Item[],
+    validator: (
+        item: Item,
+        next: (errors?: ErrorItem[] | null) => unknown
+    ) => unknown,
+    callback: (errors: ErrorItem[]) => unknown
+) {
     let index = 0;
     const arrLength = arr.length;
 
-    function next(errors) {
+    function next(errors?: ErrorItem[] | null) {
         if (errors && errors.length) {
             return callback(errors);
         }
@@ -64,37 +80,40 @@ function _asyncValidateSerials(arr, validator, callback) {
 
 /**
  * 串联校验一组数据，只返回第一个出错结果
- * @param {*} arr
- * @param {*} validator
- * @returns
  */
-async function _promiseValidateSeries(arr, validator) {
-    return arr.reduce(async (prevPromise, next) => {
-        let errors;
-        try {
-            errors = await prevPromise;
-        } catch (e) {
-            errors = e;
-        }
+async function _promiseValidateSeries<Item, ErrorItem>(
+    arr: Item[],
+    validator: (item: Item) => ErrorItem[] | Promise<ErrorItem[]>
+) {
+    return arr.reduce(
+        async (prevPromise, next) => {
+            let errors: ErrorItem[];
+            try {
+                errors = await prevPromise;
+            } catch (e) {
+                errors = e;
+            }
 
-        if (errors && errors.length) {
-            return errors;
-        }
+            if (errors && errors.length) {
+                return errors;
+            }
 
-        return validator(next);
-    }, []);
+            return validator(next);
+        },
+        [] as ErrorItem[] | Promise<ErrorItem[]>
+    );
 }
 
 /**
  * 平铺规则
- * @param  {object} objArr {name: [{value, rule}, {value, rule2}], name2: [{value2, rule3}]}
- * @return {Array} [{value, rule}, {value, rule2}, {value2, rule3}]
+ * @param objArr {name: [{value, rule}, {value, rule2}], name2: [{value2, rule3}]}
+ * @return [{value, rule}, {value, rule2}, {value2, rule3}]
  */
-function flattenObjArr(objArr) {
-    const ret = [];
-    Object.keys(objArr).forEach(k => {
-        Object.keys(objArr[k]).forEach(r => {
-            ret.push(objArr[k][r]);
+function flattenObjArr<Item>(objArr: { [key: string | number]: Item[] }) {
+    const ret: Item[] = [];
+    Object.keys(objArr).forEach((k) => {
+        Object.keys(objArr[k]).forEach((r) => {
+            ret.push(objArr[k][r as unknown as number]);
         });
     });
     return ret;
@@ -102,12 +121,17 @@ function flattenObjArr(objArr) {
 
 /**
  * 异步调用
- * @param  {map}   objArr   校验规则对象列表
- * @param  {object}   option   配置项
- * @param  {Function} validator     每个校验规则
- * @param  {Function} callback 全部完成后的执行
+ * @param objArr   校验规则对象列表
+ * @param option   配置项
+ * @param validator     每个校验规则
+ * @param callback 全部完成后的执行
  */
-export function asyncMap(objArr, option, validator, callback) {
+export function asyncMap<Item, ResultItem>(
+    objArr: Record<string, Item[]>,
+    option: { first?: boolean },
+    validator: (item: Item, next: (errors?: ResultItem[]) => void) => void,
+    callback: (results: Array<ResultItem | ResultItem[]>) => void
+) {
     // 发现第一个错误即返回
     if (option.first) {
         const flattenArr = flattenObjArr(objArr);
@@ -117,21 +141,25 @@ export function asyncMap(objArr, option, validator, callback) {
     const objArrKeys = Object.keys(objArr);
     const objArrLength = objArrKeys.length;
     let total = 0;
-    const results = [];
-    const next = errors => {
+    const results: Array<ResultItem | ResultItem[]> = [];
+    const next = (errors: ResultItem[]) => {
         results.push(errors);
         total++;
         if (total === objArrLength) {
             return callback(results);
         }
     };
-    objArrKeys.forEach(key => {
+    objArrKeys.forEach((key) => {
         const arr = objArr[key];
         _asyncValidateSerials(arr, validator, next);
     });
 }
 
-export async function asyncMapPromise(objArr, option, validator) {
+export async function asyncMapPromise<Item, ErrorItem>(
+    objArr: Record<string, Item[]>,
+    option: { first?: boolean },
+    validator: (rule: Item) => ErrorItem[] | Promise<ErrorItem[]>
+) {
     if (option.first) {
         const flatObjArr = flattenObjArr(objArr);
 
@@ -141,18 +169,18 @@ export async function asyncMapPromise(objArr, option, validator) {
     const objArrValues = Object.values(objArr);
 
     return await Promise.all(
-        objArrValues.map(val => _promiseValidateSeries(val, validator))
+        objArrValues.map((val) => _promiseValidateSeries(val, validator))
     );
 }
 
-export function complementError(rule) {
-    return oe => {
-        if (oe && oe.message) {
-            oe.field = rule.field;
-            return oe;
+export function complementError(rule: SerializedRule) {
+    return (oe: ValidateError | string): NormalizedValidateError => {
+        if (oe && typeof oe === 'object' && oe.message) {
+            (oe as NormalizedValidateError).field = rule.field;
+            return oe as NormalizedValidateError;
         }
         return {
-            message: oe,
+            message: oe as string,
             field: rule.field,
         };
     };
@@ -160,14 +188,18 @@ export function complementError(rule) {
 
 /**
  *
- * @param {Array} results errors from running validation
- * @returns {Object} { errors: Array, fields: Object }
+ * @param results errors from running validation
+ * @returns \{ errors: Array, fields: Object }
  */
-export function processErrorResults(results = []) {
-    let errors = [];
-    let fields = {};
+export function processErrorResults(
+    results:
+        | Array<NormalizedValidateError | NormalizedValidateError[]>
+        | undefined = []
+) {
+    let errors: NormalizedValidateError[] = [];
+    const fields: Record<string, NormalizedValidateError[]> = {};
 
-    function add(e) {
+    function add(e: NormalizedValidateError | NormalizedValidateError[]) {
         if (Array.isArray(e)) {
             errors = errors.concat(e);
         } else {
@@ -180,8 +212,10 @@ export function processErrorResults(results = []) {
     }
 
     if (!errors.length) {
-        errors = null;
-        fields = null;
+        return {
+            errors: null,
+            fields: null,
+        };
     } else {
         for (let i = 0; i < errors.length; i++) {
             const field = errors[i].field;
@@ -190,10 +224,9 @@ export function processErrorResults(results = []) {
                 fields[field].push(errors[i]);
             }
         }
+        return {
+            errors,
+            fields,
+        };
     }
-
-    return {
-        errors,
-        fields,
-    };
 }
