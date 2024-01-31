@@ -106,3 +106,12 @@ export type ErrorCallback = (
 export type InnerValidator = (
     rule: ValidationItem
 ) => NormalizedValidateError[] | Promise<NormalizedValidateError[]>;
+
+export type ValidationNoErrorResult = {
+    errors: null;
+    fields?: undefined | null;
+};
+export type ValidationErrorResult = {
+    errors: NormalizedValidateError[];
+    fields: Record<string, NormalizedValidateError[]>;
+};

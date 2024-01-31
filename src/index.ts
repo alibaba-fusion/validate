@@ -6,7 +6,7 @@ import {
 } from './util';
 import defaultMessages from './messages';
 import { getValidationMethod } from './validator';
-import {
+import type {
     Rule,
     RuleMap,
     SerializedRule,
@@ -19,13 +19,15 @@ import {
     ValidatorCallback,
     ValidatorCallbackErrors,
     NormalizedValidateError,
+    ValidationNoErrorResult,
+    ValidationErrorResult,
 } from './types';
 
 function noop() {}
 /**
- * @param source - {name: value, name2: value2}
- * @param rules - {name: [rule1, rule2]}
- * @returns - {name:[{value,rule1},{value, rule2}]}
+ * @param source - 校验对象，如：{name: value, name2: value2}
+ * @param rules - 对象内 key 的校验规则集合，如：{name: [rule1, rule2]}
+ * @returns 标准的校验项集合，如：{name:[{value,rule1},{value, rule2}]}
  */
 function serializeRules(source: ValidateSource, rules: RuleMap) {
     // serialize rules
@@ -94,23 +96,23 @@ class Schema {
     }
 
     /**
-     *
+     * Validate and use `Promise` to receive results
      * @param source - map of field names and values to use in validation
-     * @param callback - OPTIONAL - callback to run after all
-     * @returns
-     *          - { null } - if using callbacks
-     *          - { Promise }
-     *              - { errors: null } - if no rules or no errors
-     *              - { errors: Array, fields: Object } - errors from validation and fields that have errors
+     * @returns Validation results
      */
     validate(
         source: ValidateSource
-    ): ReturnType<(typeof this)['validatePromise']>;
+    ): Promise<ValidationNoErrorResult | ValidationErrorResult>;
+    /**
+     * Validate and use `callback` to receive results
+     * @param source - map of field names and values to use in validation
+     * @param callback - callback to run after all
+     */
     validate(source: ValidateSource, callback: ValidateCallback): void;
     validate(
         source: ValidateSource,
         callback?: ValidateCallback
-    ): Promise<unknown> | void {
+    ): Promise<ValidationNoErrorResult | ValidationErrorResult> | void {
         if (!callback) {
             return this.validatePromise(source);
         }
@@ -213,19 +215,13 @@ class Schema {
     }
 
     /**
-     *
+     * Validate and use `Promise` to receive results
      * @param source - map of field names and values to use in validation
-     * @returns
-     *          - { errors: null } if no rules or no errors
-     *          - { errors: Array, fields: Object } - errors from validation and fields that have errors
+     * @returns Validation results
      */
-    async validatePromise(source: ValidateSource): Promise<
-        | { errors: null; fields?: undefined | null }
-        | {
-              errors: NormalizedValidateError[];
-              fields: Record<string, NormalizedValidateError[]>;
-          }
-    > {
+    async validatePromise(
+        source: ValidateSource
+    ): Promise<ValidationNoErrorResult | ValidationErrorResult> {
         if (!this._rules || Object.keys(this._rules).length === 0) {
             return { errors: null };
         }
