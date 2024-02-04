@@ -195,9 +195,9 @@ class Schema {
                         errors = ([] as string[]).concat(rule.message);
                     }
 
-                    errors = errors.map(complementError(rule));
+                    const normalizeErrors = errors.map(complementError(rule));
 
-                    next(errors as NormalizedValidateError[]);
+                    next(normalizeErrors);
                 };
 
                 const res = rule.validator(rule, data.value, cb, this._options);

@@ -95,8 +95,8 @@ export interface NormalizedValidateError {
 }
 
 export type ValidateCallback = (
-    errors: ValidateError[] | null,
-    fields?: Record<string, ValidateError[]> | null
+    errors: NormalizedValidateError[] | null,
+    fields?: Record<string, NormalizedValidateError[]> | null
 ) => void;
 
 export type ErrorCallback = (
