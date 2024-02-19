@@ -3,5 +3,5 @@ module.exports = {
     coverageDirectory: './coverage/',
     collectCoverage: true,
     verbose: true,
-    preset: 'ts-jest/presets/js-with-ts',
+    preset: 'ts-jest',
 };
