@@ -1,6 +1,6 @@
 {
   "name": "@alifd/validate",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Validation to be used with @alifd/field",
   "files": [
     "demo/",
