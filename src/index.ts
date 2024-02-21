@@ -293,4 +293,5 @@ class Schema {
     }
 }
 
+export type * from './types';
 export default Schema;
