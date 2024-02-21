@@ -4,6 +4,9 @@
         "node": true
     },
     "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "project": "./tsconfig.json"
+    },
     "extends": [
         "@alifd/eslint-config-next",
         "plugin:@typescript-eslint/recommended",
@@ -18,6 +21,8 @@
         "no-unused-vars": "off",
         "@typescript-eslint/no-unused-vars": "warn",
         "no-use-before-define": "off",
-        "@typescript-eslint/no-use-before-define": "error"
+        "@typescript-eslint/no-use-before-define": "error",
+        "@typescript-eslint/consistent-type-exports": "warn",
+        "@typescript-eslint/consistent-type-imports": "warn"
     }
 }

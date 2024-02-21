@@ -1,5 +1,5 @@
 import * as util from '../util';
-import { PresetValidator } from '../types';
+import type { PresetValidator } from '../types';
 
 /**
  *  Rule for validating minimum and maximum allowed values.

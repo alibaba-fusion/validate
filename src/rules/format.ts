@@ -1,5 +1,5 @@
 import * as util from '../util';
-import { PresetValidator } from '../types';
+import type { PresetValidator } from '../types';
 
 const pattern = {
     email: /[\w\u4E00-\u9FA5]+([-+.][\w\u4E00-\u9FA5]+)*@[\w\u4E00-\u9FA5]+([-.][\w\u4E00-\u9FA5]+)*\.[\w\u4E00-\u9FA5]+([-.][\w\u4E00-\u9FA5]+)*/,

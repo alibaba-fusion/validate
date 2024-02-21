@@ -9,7 +9,9 @@ const formatRegExp = /%[sdj%]/g;
 export function format<R>(f: () => R, ...args: unknown[]): R;
 export function format(f: string, ...args: unknown[]): string;
 export function format<V>(f: V, ...args: unknown[]): V;
-export function format(...args: [unknown, ...others: unknown[]]): unknown {
+export function format(
+    ...args: [target: unknown, ...others: unknown[]]
+): unknown {
     let i = 1;
     const f = args[0];
     const len = args.length;
